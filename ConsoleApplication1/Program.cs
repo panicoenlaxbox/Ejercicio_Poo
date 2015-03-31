@@ -17,4 +17,20 @@ namespace ConsoleApplication1
             Console.ReadKey();
         }
     }
+
+    internal class Customer
+    {
+    }
+
+    internal class CustomersManager
+    {
+        public IEnumerable<Customer> RetrieveFromFile(string path)
+        {
+            return Enumerable.Empty<Customer>();
+        }
+
+        public void Print(IEnumerable<Customer> customers)
+        {
+        }
+    }
 }
