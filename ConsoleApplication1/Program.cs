@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
-using System.Threading.Tasks;
 using ClassLibrary1;
 using Newtonsoft.Json;
 
@@ -18,7 +16,7 @@ namespace ConsoleApplication1
 
     class Program
     {
-        static ExecutionType ExecutionType = ExecutionType.WebApi;
+        static ExecutionType ExecutionType = ExecutionType.WebApiRisk;
 
         static IReader CreateReader()
         {
@@ -33,6 +31,9 @@ namespace ConsoleApplication1
                     break;
                 case ExecutionType.WebApi:
                     reader = new CustomersWebApi(new Uri("http://localhost:65044/"), "api/Customers");
+                    break;
+                case ExecutionType.WebApiRisk:
+                    reader = new CustomersRiskWebApi(new Uri("http://localhost:65044/"), "api/CustomersRisk");
                     break;
             }
             return reader;
@@ -144,6 +145,30 @@ namespace ConsoleApplication1
                 HttpResponseMessage response = client.GetAsync(_requestUri).Result;
                 string content = response.Content.ReadAsStringAsync().Result;
                 List<Customer> customers = JsonConvert.DeserializeObject<List<Customer>>(content);
+                return customers;
+            }
+        }
+    }
+
+    class CustomersRiskWebApi : IReader
+    {
+        private readonly Uri _uri;
+        private readonly string _requestUri;
+
+        public CustomersRiskWebApi(Uri uri, string requestUri)
+        {
+            _uri = uri;
+            _requestUri = requestUri;
+        }
+
+        public IEnumerable<Customer> Read()
+        {
+            using (var client = new HttpClient())
+            {
+                client.BaseAddress = _uri;
+                HttpResponseMessage response = client.GetAsync(_requestUri).Result;
+                string content = response.Content.ReadAsStringAsync().Result;
+                List<CustomerRisk> customers = JsonConvert.DeserializeObject<List<CustomerRisk>>(content);
                 return customers;
             }
         }
