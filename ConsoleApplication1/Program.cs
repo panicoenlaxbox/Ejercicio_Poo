@@ -11,17 +11,10 @@ namespace ConsoleApplication1
     {
         static void Main(string[] args)
         {
-            try
-            {
-                CustomersManager manager = new CustomersManager();
-                string path = @"C:\Temp\Customers.txt";
-                IEnumerable<Customer> customers = manager.RetrieveFromFile(path);
-                manager.Print(customers);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.ToString());
-            }
+            CustomersManager manager = new CustomersManager();
+            string path = @"C:\Temp\Customers.txt";
+            IEnumerable<Customer> customers = manager.RetrieveFromFile(path);
+            manager.Print(customers);
             Console.ReadKey();
         }
     }
@@ -58,19 +51,7 @@ namespace ConsoleApplication1
 
         private IEnumerable<string> GetLinesFromFile(string path)
         {
-            using (FileStream fs = new FileStream(path, FileMode.Open))
-            {
-                using (StreamReader sr = new StreamReader(fs))
-                {
-                    List<string> lines = new List<string>();
-                    while (!sr.EndOfStream)
-                    {
-                        lines.Add(sr.ReadLine());
-                    }
-                    throw new Exception();
-                    return lines;
-                }
-            }
+            return System.IO.File.ReadAllLines(path);
         }
 
         private Customer GetCustomerFromText(string text)
