@@ -7,12 +7,50 @@ using System.Threading.Tasks;
 
 namespace ConsoleApplication1
 {
+    enum CustomersType
+    {
+        Normal,
+        Risk
+    }
+
     class Program
     {
+        static CustomersType CustomersType = CustomersType.Normal;
+
+        static CustomersFileReaderBase CreateReader()
+        {
+            CustomersFileReaderBase reader = null;
+            switch (CustomersType)
+            {
+                case CustomersType.Normal:
+                    reader = new CustomersFileReader();
+                    break;
+                case CustomersType.Risk:
+                    reader = new CustomersRiskFileReader();
+                    break;
+            }
+            return reader;
+        }
+
+        static string GetPath()
+        {
+            var path = "";
+            switch (CustomersType)
+            {
+                case CustomersType.Normal:
+                    path = "C:\\Temp\\Customers.txt";
+                    break;
+                case CustomersType.Risk:
+                    path = "C:\\Temp\\CustomersRisk.txt";
+                    break;
+            }
+            return path;
+        }
+
         static void Main(string[] args)
         {
-            var reader = new CustomersFileReader();
-            string path = @"C:\Temp\CustomersRisk.txt";
+            CustomersFileReaderBase reader = CreateReader();
+            string path = GetPath();
             IEnumerable<Customer> customers = reader.Read(path);
             var printer = new CustomersPrinter();
             printer.Print(customers);
@@ -68,7 +106,7 @@ namespace ConsoleApplication1
         }
     }
 
-    class CustomersFileReader
+    abstract class CustomersFileReaderBase
     {
         public IEnumerable<Customer> Read(string path)
         {
@@ -86,20 +124,29 @@ namespace ConsoleApplication1
             return System.IO.File.ReadAllLines(path);
         }
 
-        private Customer GetCustomerFromLine(string line)
+        abstract protected Customer GetCustomerFromLine(string line);
+    }
+
+    class CustomersFileReader : CustomersFileReaderBase
+    {
+        protected override Customer GetCustomerFromLine(string line)
         {
             string[] values = line.Split(new[] { ',' });
             string id = values[0];
             string name = values[1];
-            if (values.Length == 2)
-            {
-                return new Customer(id, name);
-            }
-            else
-            {
-                int risk = int.Parse(values[2]);
-                return new CustomerRisk(id, name, risk);
-            }
+            return new Customer(id, name);
+        }
+    }
+
+    class CustomersRiskFileReader : CustomersFileReaderBase
+    {
+        protected override Customer GetCustomerFromLine(string line)
+        {
+            string[] values = line.Split(new[] { ',' });
+            string id = values[0];
+            string name = values[1];
+            int risk = int.Parse(values[2]);
+            return new CustomerRisk(id, name, risk);
         }
     }
 }
