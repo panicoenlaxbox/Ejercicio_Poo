@@ -20,17 +20,32 @@ namespace ConsoleApplication1
 
     internal class Customer
     {
+        public string Id { get; set; }
+        public string Name { get; set; }
     }
 
     internal class CustomersManager
     {
         public IEnumerable<Customer> RetrieveFromFile(string path)
         {
-            return Enumerable.Empty<Customer>();
+            Customer customer = new Customer();
+            customer.Id = "1";
+            customer.Name = "Customer 1";
+            Customer customer2 = new Customer();
+            customer2.Id = "2";
+            customer2.Name = "Customer 2";
+            List<Customer> customers = new List<Customer>();
+            customers.Add(customer);
+            customers.Add(customer2);
+            return customers;
         }
 
         public void Print(IEnumerable<Customer> customers)
         {
+            foreach (var customer in customers)
+            {
+                Console.WriteLine("Id {0}, Name {1}", customer.Id, customer.Name);
+            }
         }
     }
 }
