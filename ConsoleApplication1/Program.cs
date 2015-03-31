@@ -12,7 +12,7 @@ namespace ConsoleApplication1
         static void Main(string[] args)
         {
             var reader = new CustomersFileReader();
-            string path = @"C:\Temp\Customers.txt";
+            string path = @"C:\Temp\CustomersRisk.txt";
             IEnumerable<Customer> customers = reader.Read(path);
             var printer = new CustomersPrinter();
             printer.Print(customers);
@@ -31,9 +31,29 @@ namespace ConsoleApplication1
             Name = name;
         }
 
-        public override string ToString()
+        protected string GetTextRepresentation()
         {
             return string.Format("Id {0}, Name {1}", Id, Name);
+        }
+
+        public override string ToString()
+        {
+            return GetTextRepresentation();
+        }
+    }
+
+    class CustomerRisk : Customer
+    {
+        public int Risk { get; set; }
+        public CustomerRisk(string id, string name, int risk)
+            : base(id, name)
+        {
+            Risk = risk;
+        }
+
+        public override string ToString()
+        {
+            return string.Format("{0}, Risk {1}", GetTextRepresentation(), Risk);
         }
     }
 
@@ -71,7 +91,15 @@ namespace ConsoleApplication1
             string[] values = line.Split(new[] { ',' });
             string id = values[0];
             string name = values[1];
-            return new Customer(id, name);
+            if (values.Length == 2)
+            {
+                return new Customer(id, name);
+            }
+            else
+            {
+                int risk = int.Parse(values[2]);
+                return new CustomerRisk(id, name, risk);
+            }
         }
     }
 }
