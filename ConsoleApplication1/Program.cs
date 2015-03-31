@@ -1,49 +1,41 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
 using ClassLibrary1;
+using Newtonsoft.Json;
 
 namespace ConsoleApplication1
 {
-    enum CustomersType
+    enum ExecutionType
     {
-        Normal,
-        Risk
+        File,
+        FileRisk,
+        WebApi,
+        WebApiRisk
     }
 
     class Program
     {
-        static CustomersType CustomersType = CustomersType.Risk;
+        static ExecutionType ExecutionType = ExecutionType.WebApi;
 
         static IReader CreateReader()
         {
             IReader reader = null;
-            var path = GetPath();
-            switch (CustomersType)
+            switch (ExecutionType)
             {
-                case CustomersType.Normal:
-                    reader = new CustomersFileReader(path);
+                case ExecutionType.File:
+                    reader = new CustomersFileReader("C:\\Temp\\Customers.txt");
                     break;
-                case CustomersType.Risk:
-                    reader = new CustomersRiskFileReader(path);
+                case ExecutionType.FileRisk:
+                    reader = new CustomersRiskFileReader("C:\\Temp\\CustomersRisk.txt");
+                    break;
+                case ExecutionType.WebApi:
+                    reader = new CustomersWebApi(new Uri("http://localhost:65044/"), "api/Customers");
                     break;
             }
             return reader;
-        }
-
-        static string GetPath()
-        {
-            var path = "";
-            switch (CustomersType)
-            {
-                case CustomersType.Normal:
-                    path = "C:\\Temp\\Customers.txt";
-                    break;
-                case CustomersType.Risk:
-                    path = "C:\\Temp\\CustomersRisk.txt";
-                    break;
-            }
-            return path;
         }
 
         static void Main(string[] args)
@@ -67,7 +59,7 @@ namespace ConsoleApplication1
         }
     }
 
-    internal interface IReader
+    interface IReader
     {
         IEnumerable<Customer> Read();
     }
@@ -130,6 +122,30 @@ namespace ConsoleApplication1
             string name = values[1];
             int risk = int.Parse(values[2]);
             return new CustomerRisk(id, name, risk);
+        }
+    }
+
+    class CustomersWebApi : IReader
+    {
+        private readonly Uri _uri;
+        private readonly string _requestUri;
+
+        public CustomersWebApi(Uri uri, string requestUri)
+        {
+            _uri = uri;
+            _requestUri = requestUri;
+        }
+
+        public IEnumerable<Customer> Read()
+        {
+            using (var client = new HttpClient())
+            {
+                client.BaseAddress = _uri;
+                HttpResponseMessage response = client.GetAsync(_requestUri).Result;
+                string content = response.Content.ReadAsStringAsync().Result;
+                List<Customer> customers = JsonConvert.DeserializeObject<List<Customer>>(content);
+                return customers;
+            }
         }
     }
 }
