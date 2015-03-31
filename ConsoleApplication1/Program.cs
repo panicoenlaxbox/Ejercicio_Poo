@@ -28,6 +28,11 @@ namespace ConsoleApplication1
             Id = id;
             Name = name;
         }
+
+        public override string ToString()
+        {
+            return string.Format("Id {0}, Name {1}", Id, Name);
+        }
     }
 
     internal class CustomersManager
@@ -44,7 +49,7 @@ namespace ConsoleApplication1
         {
             foreach (var customer in customers)
             {
-                Console.WriteLine("Id {0}, Name {1}", customer.Id, customer.Name);
+                Console.WriteLine(customer.ToString());
             }
         }
     }
