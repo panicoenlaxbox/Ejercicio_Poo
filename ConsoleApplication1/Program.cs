@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,7 +12,7 @@ namespace ConsoleApplication1
         static void Main(string[] args)
         {
             CustomersManager manager = new CustomersManager();
-            string path = "";
+            string path =  @"C:\Temp\Customers.txt";
             IEnumerable<Customer> customers = manager.RetrieveFromFile(path);
             manager.Print(customers);
             Console.ReadKey();
@@ -50,7 +51,30 @@ namespace ConsoleApplication1
 
         private IEnumerable<string> GetLinesFromFile(string path)
         {
-            return new String[] { "1,Customer1", "2,Customer2" };
+            List<string> lines = new List<string>();
+            FileStream fs = null;
+            StreamReader sr = null;
+            try
+            {
+                fs = new FileStream(path, FileMode.Open);
+                sr = new StreamReader(fs);
+                while (!sr.EndOfStream)
+                {
+                    lines.Add(sr.ReadLine());    
+                }
+                return lines;
+            }
+            finally
+            {
+                if (fs != null)
+                {
+                    fs.Dispose();
+                }
+                if (sr != null)
+                {
+                    sr.Dispose();
+                }
+            }
         }
 
         private Customer GetCustomerFromText(string text)
