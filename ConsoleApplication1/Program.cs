@@ -10,6 +10,11 @@ namespace ConsoleApplication1
     {
         static void Main(string[] args)
         {
+            CustomersManager manager = new CustomersManager();
+            string path = "";
+            IEnumerable<Customer> customers = manager.RetrieveFromFile(path);
+            manager.Print(customers);
+            Console.ReadKey();
         }
     }
 }
