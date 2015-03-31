@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using ClassLibrary1;
 
 namespace ConsoleApplication1
@@ -12,18 +13,19 @@ namespace ConsoleApplication1
 
     class Program
     {
-        static CustomersType CustomersType = CustomersType.Normal;
+        static CustomersType CustomersType = CustomersType.Risk;
 
-        static CustomersFileReaderBase CreateReader()
+        static IReader CreateReader()
         {
-            CustomersFileReaderBase reader = null;
+            IReader reader = null;
+            var path = GetPath();
             switch (CustomersType)
             {
                 case CustomersType.Normal:
-                    reader = new CustomersFileReader();
+                    reader = new CustomersFileReader(path);
                     break;
                 case CustomersType.Risk:
-                    reader = new CustomersRiskFileReader();
+                    reader = new CustomersRiskFileReader(path);
                     break;
             }
             return reader;
@@ -46,9 +48,8 @@ namespace ConsoleApplication1
 
         static void Main(string[] args)
         {
-            CustomersFileReaderBase reader = CreateReader();
-            string path = GetPath();
-            IEnumerable<Customer> customers = reader.Read(path);
+            IReader reader = CreateReader();
+            IEnumerable<Customer> customers = reader.Read();
             var printer = new CustomersPrinter();
             printer.Print(customers);
             Console.ReadKey();
@@ -66,11 +67,23 @@ namespace ConsoleApplication1
         }
     }
 
-    abstract class CustomersFileReaderBase
+    internal interface IReader
     {
-        public IEnumerable<Customer> Read(string path)
+        IEnumerable<Customer> Read();
+    }
+
+    abstract class CustomersFileReaderBase : IReader
+    {
+        private readonly string _path;
+
+        public CustomersFileReaderBase(string path)
         {
-            IEnumerable<string> lines = GetLines(path);
+            _path = path;
+        }
+
+        public IEnumerable<Customer> Read()
+        {
+            IEnumerable<string> lines = GetLines(_path);
             var customers = new List<Customer>();
             foreach (var line in lines)
             {
@@ -89,6 +102,11 @@ namespace ConsoleApplication1
 
     class CustomersFileReader : CustomersFileReaderBase
     {
+        public CustomersFileReader(string path)
+            : base(path)
+        {
+
+        }
         protected override Customer GetCustomerFromLine(string line)
         {
             string[] values = line.Split(new[] { ',' });
@@ -100,6 +118,11 @@ namespace ConsoleApplication1
 
     class CustomersRiskFileReader : CustomersFileReaderBase
     {
+        public CustomersRiskFileReader(string path)
+            : base(path)
+        {
+
+        }
         protected override Customer GetCustomerFromLine(string line)
         {
             string[] values = line.Split(new[] { ',' });
