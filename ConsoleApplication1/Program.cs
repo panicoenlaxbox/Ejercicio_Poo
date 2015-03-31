@@ -58,29 +58,17 @@ namespace ConsoleApplication1
 
         private IEnumerable<string> GetLinesFromFile(string path)
         {
-            List<string> lines = new List<string>();
-            FileStream fs = null;
-            StreamReader sr = null;
-            try
+            using (FileStream fs = new FileStream(path, FileMode.Open))
             {
-                fs = new FileStream(path, FileMode.Open);
-                sr = new StreamReader(fs);
-                while (!sr.EndOfStream)
+                using (StreamReader sr = new StreamReader(fs))
                 {
-                    lines.Add(sr.ReadLine());
-                }
-                throw new Exception();
-                return lines;
-            }
-            finally
-            {
-                if (fs != null)
-                {
-                    //fs.Dispose();
-                }
-                if (sr != null)
-                {
-                    //sr.Dispose();
+                    List<string> lines = new List<string>();
+                    while (!sr.EndOfStream)
+                    {
+                        lines.Add(sr.ReadLine());
+                    }
+                    throw new Exception();
+                    return lines;
                 }
             }
         }
