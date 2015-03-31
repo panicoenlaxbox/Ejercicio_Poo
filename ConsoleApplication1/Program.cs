@@ -22,18 +22,20 @@ namespace ConsoleApplication1
     {
         public string Id { get; set; }
         public string Name { get; set; }
+
+        public Customer(string id, string name)
+        {
+            Id = id;
+            Name = name;
+        }
     }
 
     internal class CustomersManager
     {
         public IEnumerable<Customer> RetrieveFromFile(string path)
         {
-            Customer customer = new Customer();
-            customer.Id = "1";
-            customer.Name = "Customer 1";
-            Customer customer2 = new Customer();
-            customer2.Id = "2";
-            customer2.Name = "Customer 2";
+            Customer customer = new Customer("1", "Customer 1");
+            Customer customer2 = new Customer("2", "Customer 2");
             List<Customer> customers = new List<Customer>();
             customers.Add(customer);
             customers.Add(customer2);
