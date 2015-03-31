@@ -11,10 +11,11 @@ namespace ConsoleApplication1
     {
         static void Main(string[] args)
         {
-            CustomersManager manager = new CustomersManager();
+            var reader = new CustomersFileReader();
             string path = @"C:\Temp\Customers.txt";
-            IEnumerable<Customer> customers = manager.RetrieveFromFile(path);
-            manager.Print(customers);
+            IEnumerable<Customer> customers = reader.Read(path);
+            var printer = new CustomersPrinter();
+            printer.Print(customers);
             Console.ReadKey();
         }
     }
@@ -36,38 +37,41 @@ namespace ConsoleApplication1
         }
     }
 
-    class CustomersManager
+    class CustomersPrinter
     {
-        public IEnumerable<Customer> RetrieveFromFile(string path)
-        {
-            IEnumerable<string> lines = GetLinesFromFile(path);
-            var customers = new List<Customer>();
-            foreach (var line in lines)
-            {
-                customers.Add(GetCustomerFromText(line));
-            }
-            return customers;
-        }
-
-        private IEnumerable<string> GetLinesFromFile(string path)
-        {
-            return System.IO.File.ReadAllLines(path);
-        }
-
-        private Customer GetCustomerFromText(string text)
-        {
-            string[] values = text.Split(new[] { ',' });
-            string id = values[0];
-            string name = values[1];
-            return new Customer(id, name);
-        }
-
         public void Print(IEnumerable<Customer> customers)
         {
             foreach (var customer in customers)
             {
                 Console.WriteLine(customer.ToString());
             }
+        }
+    }
+
+    class CustomersFileReader
+    {
+        public IEnumerable<Customer> Read(string path)
+        {
+            IEnumerable<string> lines = GetLines(path);
+            var customers = new List<Customer>();
+            foreach (var line in lines)
+            {
+                customers.Add(GetCustomerFromLine(line));
+            }
+            return customers;
+        }
+
+        private IEnumerable<string> GetLines(string path)
+        {
+            return System.IO.File.ReadAllLines(path);
+        }
+
+        private Customer GetCustomerFromLine(string line)
+        {
+            string[] values = line.Split(new[] { ',' });
+            string id = values[0];
+            string name = values[1];
+            return new Customer(id, name);
         }
     }
 }
