@@ -18,7 +18,7 @@ namespace ConsoleApplication1
         }
     }
 
-    internal class Customer
+    class Customer
     {
         public string Id { get; set; }
         public string Name { get; set; }
@@ -35,7 +35,7 @@ namespace ConsoleApplication1
         }
     }
 
-    internal class CustomersManager
+    class CustomersManager
     {
         public IEnumerable<Customer> RetrieveFromFile(string path)
         {
