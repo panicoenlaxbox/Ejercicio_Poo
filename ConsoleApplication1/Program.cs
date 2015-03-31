@@ -11,10 +11,17 @@ namespace ConsoleApplication1
     {
         static void Main(string[] args)
         {
-            CustomersManager manager = new CustomersManager();
-            string path =  @"C:\Temp\Customers.txt";
-            IEnumerable<Customer> customers = manager.RetrieveFromFile(path);
-            manager.Print(customers);
+            try
+            {
+                CustomersManager manager = new CustomersManager();
+                string path = @"C:\Temp\Customers.txt";
+                IEnumerable<Customer> customers = manager.RetrieveFromFile(path);
+                manager.Print(customers);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+            }
             Console.ReadKey();
         }
     }
@@ -60,19 +67,20 @@ namespace ConsoleApplication1
                 sr = new StreamReader(fs);
                 while (!sr.EndOfStream)
                 {
-                    lines.Add(sr.ReadLine());    
+                    lines.Add(sr.ReadLine());
                 }
+                throw new Exception();
                 return lines;
             }
             finally
             {
                 if (fs != null)
                 {
-                    fs.Dispose();
+                    //fs.Dispose();
                 }
                 if (sr != null)
                 {
-                    sr.Dispose();
+                    //sr.Dispose();
                 }
             }
         }
