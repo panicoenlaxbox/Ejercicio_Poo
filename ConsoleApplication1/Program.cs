@@ -39,10 +39,9 @@ namespace ConsoleApplication1
     {
         public IEnumerable<Customer> RetrieveFromFile(string path)
         {
-            Customer customer = new Customer("1", "Customer 1");
-            Customer customer2 = new Customer("2", "Customer 2");
-            List<Customer> customers = new List<Customer> { customer, customer2 };
-            return customers;
+            var customer = new Customer("1", "Customer 1");
+            var customer2 = new Customer("2", "Customer 2");
+            return new List<Customer> { customer, customer2 };
         }
 
         public void Print(IEnumerable<Customer> customers)
