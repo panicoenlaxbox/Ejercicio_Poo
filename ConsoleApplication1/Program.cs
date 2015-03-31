@@ -36,9 +36,7 @@ namespace ConsoleApplication1
         {
             Customer customer = new Customer("1", "Customer 1");
             Customer customer2 = new Customer("2", "Customer 2");
-            List<Customer> customers = new List<Customer>();
-            customers.Add(customer);
-            customers.Add(customer2);
+            List<Customer> customers = new List<Customer> { customer, customer2 };
             return customers;
         }
 
