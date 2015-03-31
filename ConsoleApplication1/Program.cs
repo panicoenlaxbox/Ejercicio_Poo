@@ -39,10 +39,18 @@ namespace ConsoleApplication1
     {
         public IEnumerable<Customer> RetrieveFromFile(string path)
         {
-            string text = "1,Customer 1";
-            var customer = GetCustomerFromText(text);
-            var customer2 = GetCustomerFromText(text);
-            return new List<Customer> { customer, customer2 };
+            IEnumerable<string> lines = GetLinesFromFile(path);
+            var customers = new List<Customer>();
+            foreach (var line in lines)
+            {
+                customers.Add(GetCustomerFromText(line));
+            }
+            return customers;
+        }
+
+        private IEnumerable<string> GetLinesFromFile(string path)
+        {
+            return new String[] { "1,Customer1", "2,Customer2" };
         }
 
         private Customer GetCustomerFromText(string text)
