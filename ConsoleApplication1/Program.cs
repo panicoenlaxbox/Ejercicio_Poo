@@ -16,12 +16,12 @@ namespace ConsoleApplication1
 
     class Program
     {
-        static ExecutionType ExecutionType = ExecutionType.WebApiRisk;
+        static ExecutionType _executionType = ExecutionType.WebApiRisk;
 
         static IReader CreateReader()
         {
             IReader reader = null;
-            switch (ExecutionType)
+            switch (_executionType)
             {
                 case ExecutionType.File:
                     reader = new CustomersFileReader("C:\\Temp\\Customers.txt");
@@ -126,56 +126,53 @@ namespace ConsoleApplication1
         }
     }
 
-    class WebApiReader
+    abstract class WebApiReaderBase<T>
     {
-        public IEnumerable<T> Read<T>(Uri uri, string requestUri)
+        private readonly Uri _uri;
+        private readonly string _requestUri;
+
+        protected WebApiReaderBase(Uri uri, string requestUri)
+        {
+            _uri = uri;
+            _requestUri = requestUri;
+        }
+
+        protected virtual IEnumerable<T> Get()
         {
             using (var client = new HttpClient())
             {
-                client.BaseAddress = uri;
-                HttpResponseMessage response = client.GetAsync(requestUri).Result;
+                client.BaseAddress = _uri;
+                HttpResponseMessage response = client.GetAsync(_requestUri).Result;
                 string content = response.Content.ReadAsStringAsync().Result;
                 List<T> customers = JsonConvert.DeserializeObject<List<T>>(content);
                 return customers;
             }
-        }  
+        }
     }
 
-    class CustomersWebApiReader : IReader
+    class CustomersWebApiReader : WebApiReaderBase<Customer>, IReader
     {
-        private readonly Uri _uri;
-        private readonly string _requestUri;
-        private readonly WebApiReader _reader;
-
         public CustomersWebApiReader(Uri uri, string requestUri)
+            : base(uri, requestUri)
         {
-            _uri = uri;
-            _requestUri = requestUri;
-            _reader = new WebApiReader();
         }
 
         public IEnumerable<Customer> Read()
         {
-            return _reader.Read<Customer>(_uri, _requestUri);
+            return Get();
         }
     }
 
-    class CustomersRiskWebApiReader : IReader
+    class CustomersRiskWebApiReader : WebApiReaderBase<CustomerRisk>, IReader
     {
-        private readonly Uri _uri;
-        private readonly string _requestUri;
-        private readonly WebApiReader _reader;
-
         public CustomersRiskWebApiReader(Uri uri, string requestUri)
+            : base(uri, requestUri)
         {
-            _uri = uri;
-            _requestUri = requestUri;
-            _reader = new WebApiReader();
         }
 
         public IEnumerable<Customer> Read()
         {
-            return _reader.Read<CustomerRisk>(_uri, _requestUri);
+            return Get();
         }
     }
 }
