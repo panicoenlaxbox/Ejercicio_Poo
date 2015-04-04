@@ -80,6 +80,7 @@ namespace ConsoleApplication1
             var customers = new List<Customer>();
             foreach (var line in lines)
             {
+                // Template Method Pattern
                 customers.Add(GetCustomerFromLine(line));
             }
             return customers;
